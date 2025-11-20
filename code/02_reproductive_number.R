@@ -17,7 +17,7 @@ source("code/00_setup.R")
 R0 <- 12        # basis reproduction number
 GT <- 10        # generation time (days)
 I0 <- 1        # initial cases at time 0
-t_max <- 30   # days to simulate
+t_max <- 60   # days to simulate
 times <- seq(0, t_max, by = 1)
 
 # exponential model
@@ -48,7 +48,7 @@ ggplot(df) +
     axis.title  = element_text(size=text_size),
     title =element_text(size=title_size))
 
-ggsave("figures/figure_exponential_measles30_4.png",h=8,w=8)
+ggsave("figures/figure_exponential_measels60.png",h=8,w=8)
 
 
 #############################################
@@ -63,7 +63,7 @@ dt <- read.csv("data/daily.csv", sep=";") %>%
 
 before <- 7 # how many days included before
 after <- 7 # how many days included after
-begin <- ymd(18891210 ) # begin estimation, you cannot start with zero, will lead to an error
+begin <- ymd(18891210 ) # begin estimation, values the days before should not be zero -> error
 end <- ymd(18900131)  #  end estimation
 
 GT <- 3 # generation time
@@ -72,7 +72,7 @@ rate <- GT/GT_sd^2 # calculate rate
 shape <- GT^2/GT_sd^2 # calculate shape
 
 
-
+# data frame for the outcomes
 dt_re <- data.frame(date = seq(begin + before, end - after, 1),
                     Re = NA,
                     Re_lower = NA,

@@ -7,8 +7,6 @@
 rm(list=ls())
 source("code/00_setup.R")
 
-
-
 # load data
 dt <- read.csv("data/dataZH_month.csv", sep=";") %>%
   mutate(
@@ -232,7 +230,6 @@ ggplot(dt5) +
 
 ggsave("figures/figure_glm_monthly.png",h=8,w=15)  
 
-
 ##############
 # Comparison #
 ##############
@@ -275,28 +272,3 @@ ggplot(dt6) +
 
 ggsave("figures/figure_comparison.png",h=8,w=15)  
 
-
-ggplot(dt6) +
-  geom_bar(aes(x = year_month, y = exc_mx, fill = method),stat = "identity", position = "dodge") +
-  scale_x_date(labels = date_format("%m/%y"), 
-               breaks = date_breaks("1 month"),
-               expand  = c(0, 0)) +
-  scale_fill_manual("methods:",
-                    breaks=c("exc_a", "exc_glm", "exc_ma"),
-                    labels =c("Simple average","Monthly average","GLM surfling"),
-                    values = c(col5[1], col5[2],col5[3])) +
-  xlab("Month/Year")+
-  ylab("excess mortality per 100k")+
-  ggtitle("Comparison excess death") +
-  theme_bw()+
-  theme(
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank(),
-    legend.position = c(0.5, 0.8),
-    legend.text = element_text(size=text_size),
-    axis.text.x = element_text(size=text_size,angle=45,hjust=1),
-    axis.text.y = element_text(size=text_size),
-    axis.title  = element_text(size=text_size),
-    title =element_text(size=title_size))
-
-ggsave("figures/figure_comparison_mortality.png",h=8,w=15)  
