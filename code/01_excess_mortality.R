@@ -12,8 +12,8 @@ dt <- read.csv("data/dataZH_month.csv", sep=";") %>%
   mutate(
     mortality = death/pop*100000, # Mortality per 100k
     year_month = ymd(paste0(year,"-",month,"-01")),  # define as date, makes it easier for plotting
-    w = case_when(year_month > ymd("1918-05-01") & year_month < ymd("1919-03-01") |
-                    year_month > ymd("1919-12-31") & year_month< ymd("1920-04-01") ~ 0, 
+    w = case_when(year_month > ymd("1918-05-01") & year_month < ymd("1919-04-01") |
+                  year_month > ymd("1919-12-31") & year_month< ymd("1920-05-01") ~ 0, 
                   TRUE ~ 1), #  define pandemic period, 0 = pandemic
     si_one = sin(2*pi*month/12), #  define seasonality
     si_two = sin(4*pi*month/12),
@@ -30,13 +30,13 @@ ggplot() +
                expand  = c(0, 0)) +   
   annotate("rect",
            xmin=as.Date(ymd("1918-06-01")),
-           xmax=as.Date(ymd("1919-04-01")),
+           xmax=as.Date(ymd("1919-03-01")),
            ymin=-Inf,
            ymax=Inf,
            alpha=0.1,
            fill="black") +
   annotate("rect",
-           xmin=as.Date(ymd("1919-12-01")),
+           xmin=as.Date(ymd("1920-01-01")),
            xmax=as.Date(ymd("1920-04-01")),
            ymin=-Inf,
            ymax=Inf,
@@ -87,13 +87,13 @@ ggplot() +
                expand  = c(0, 0)) +   
   annotate("rect",
            xmin=as.Date(ymd("1918-06-01")),
-           xmax=as.Date(ymd("1919-04-01")),
+           xmax=as.Date(ymd("1919-03-01")),
            ymin=-Inf,
            ymax=Inf,
            alpha=0.1,
            fill="black") +
   annotate("rect",
-           xmin=as.Date(ymd("1919-12-01")),
+           xmin=as.Date(ymd("1920-01-01")),
            xmax=as.Date(ymd("1920-04-01")),
            ymin=-Inf,
            ymax=Inf,
@@ -101,7 +101,7 @@ ggplot() +
            fill="black") +
   xlab("Month/Year")+
   ylab("deaths")+
-  ggtitle("Average whole training period") +
+  # ggtitle("Average of whole the training period") +
   theme_bw()+
   theme(
     panel.grid.major.x = element_blank(),
@@ -143,13 +143,13 @@ ggplot() +
                expand  = c(0, 0)) +   
   annotate("rect",
            xmin=as.Date(ymd("1918-06-01")),
-           xmax=as.Date(ymd("1919-04-01")),
+           xmax=as.Date(ymd("1919-03-01")),
            ymin=-Inf,
            ymax=Inf,
            alpha=0.1,
            fill="black") +
   annotate("rect",
-           xmin=as.Date(ymd("1919-12-01")),
+           xmin=as.Date(ymd("1920-01-01")),
            xmax=as.Date(ymd("1920-04-01")),
            ymin=-Inf,
            ymax=Inf,
@@ -157,7 +157,7 @@ ggplot() +
            fill="black") +
   xlab("Month/Year")+
   ylab("deaths")+
-  ggtitle("Monthly specific average of training period") +
+  # ggtitle("Monthly specific average of the training period") +
   theme_bw()+
   theme(
     panel.grid.major.x = element_blank(),
@@ -204,13 +204,13 @@ ggplot(dt5) +
                expand  = c(0, 0)) +   
   annotate("rect",
            xmin=as.Date(ymd("1918-06-01")),
-           xmax=as.Date(ymd("1919-04-01")),
+           xmax=as.Date(ymd("1919-03-01")),
            ymin=-Inf,
            ymax=Inf,
            alpha=0.1,
            fill="black") +
   annotate("rect",
-           xmin=as.Date(ymd("1919-12-01")),
+           xmin=as.Date(ymd("1920-01-01")),
            xmax=as.Date(ymd("1920-04-01")),
            ymin=-Inf,
            ymax=Inf,
@@ -218,7 +218,7 @@ ggplot(dt5) +
            fill="black") +
   xlab("Month/Year")+
   ylab("deaths")+
-  ggtitle("GLM Serfling model") +
+  # ggtitle("GLM Serfling model") +
   theme_bw()+
   theme(
     panel.grid.major.x = element_blank(),
@@ -243,12 +243,13 @@ dt6 <- dt5 %>%
   filter(w==0) %>%
   gather(., method, exc_death, exc_a:exc_glm) %>%
   mutate(
-    exc_mx = exc_death/pop*100000
+    exc_mx = exc_death/pop*100000,
+    p_s = exc_mx/mortality *100
   )
 
     
 ggplot(dt6) +
-  geom_bar(aes(x = year_month, y = exc_death, fill = method),stat = "identity", position = "dodge") +
+  geom_bar(aes(x = year_month, y =  exc_mx, fill = method),stat = "identity", position = "dodge") +
   scale_x_date(labels = date_format("%m/%y"), 
                breaks = date_breaks("1 month"),
                expand  = c(0, 0)) +
@@ -257,8 +258,8 @@ ggplot(dt6) +
                     labels =c("Simple average","Monthly average","GLM surfling"),
                     values = c(col5[1], col5[2],col5[3])) +
   xlab("Month/Year")+
-  ylab("excess deaths")+
-  ggtitle("Comparison excess death") +
+  ylab("excess mortality per 100k")+
+  # ggtitle("Comparison excess mortality") +
   theme_bw()+
   theme(
     panel.grid.major.x = element_blank(),
@@ -271,4 +272,29 @@ ggplot(dt6) +
     title =element_text(size=title_size))
 
 ggsave("figures/figure_comparison.png",h=8,w=15)  
+
+ggplot(dt6) +
+  geom_bar(aes(x = year_month, y = p_s, fill = method),stat = "identity", position = "dodge") +
+  scale_x_date(labels = date_format("%m/%y"), 
+               breaks = date_breaks("1 month"),
+               expand  = c(0, 0)) +
+  scale_fill_manual("methods:",
+                    breaks=c("exc_a", "exc_glm", "exc_ma"),
+                    labels =c("Simple average","Monthly average","GLM surfling"),
+                    values = c(col5[1], col5[2],col5[3])) +
+  xlab("Month/Year")+
+  ylab("P-score in percentage")+
+  # ggtitle("P-score") +
+  theme_bw()+
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    legend.position = c(0.5, 0.8),
+    legend.text = element_text(size=text_size),
+    axis.text.x = element_text(size=text_size,angle=45,hjust=1),
+    axis.text.y = element_text(size=text_size),
+    axis.title  = element_text(size=text_size),
+    title =element_text(size=title_size))
+
+ggsave("figures/figure_p_score.png",h=8,w=15)  
 
